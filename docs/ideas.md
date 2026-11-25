@@ -67,6 +67,47 @@ Brainstorming of 2026-11-25. The user said they're interested in all of them: th
 - Integration with other systems (boiler, heat pump, solar panels).
 - A product for other Micronova stove owners (the platform is shared by dozens of brands).
 
-## To add
+## 10. From the official app's reviews
 
-- Complaints and requests from the Klover Home app reviews on the Play Store.
+Collected on 2026-11-25.
+
+**Sources**
+- All 136 written Google Play reviews (Italian store), read in the browser.
+- About 13 App Store reviews.
+- Reviews of sibling apps on the same Micronova platform.
+
+**Ratings**
+- Google Play: 1.9★ from 352 ratings, 10K+ downloads. 200 of the 344 phone ratings are 1★.
+- Italian App Store: 2.0★.
+
+**Themes, roughly in order of frequency**
+
+- **Cloud and connection reliability**: far ahead of everything else, more than half the reviews.
+  - Symptoms: "unknown status", "an error occurred, try again later", "authentication failed", app offline while the phone is online, and commands that work "one time out of three".
+  - Platform-wide outages: on 2022-10-09 and 2022-11-21/22, many reviews report the app dead on every device at once.
+  - Some users must unplug the stove, or reconfigure the Wi-Fi module after a power cut, to get the connection back.
+  - The Home Assistant and Homebridge communities report the same about the Agua IOT API (errors 500, JWT login failures).
+  - Consequences for us: retries, confirming that each command took effect, a watchdog, and telling the user when the cloud is down instead of failing silently.
+- **The fan can't be set to OFF from the app**: about 12 reviews, from 2021 to 2026. It can only be set to 1…auto, so OFF needs the stove's panel. In 2021 the option disappeared after an update. Some also ask to see or adjust the exhaust fan speed. **This matters to us directly: the user keeps the fan off.** M0 must check whether the API accepts fan = 0.
+- **Program slots should carry parameters**: power, fan and water temperature per slot, not just on/off. About 6 reviews; one says "it used to be possible". Other requests:
+  - named programs, each enabled or disabled individually;
+  - more than **4 programs**, which is the current limit;
+  - fan control from the chrono.
+  This is exactly our multi-step program.
+- **The stove panel's chrono overrides the app**: if the chrono is set on the stove's touch panel, "the app has no power to interfere". Confirms that two schedulers conflict.
+- **Pellet reserve**: about 8 reviews. People want a notification when the reserve is reached (today it shows only on the stove's display), a level indicator, or a beep.
+- **Alarm notifications**: about 8 reviews. Push notifications for alarms, errors, missing pellets and power cuts, with a description and not just a code.
+- **Restart after an alarm, remotely**: about 5 reviews. After a failed ignition or empty-pellet alarm, people want to reset and restart from outside the house. One complains they can't even switch off a stove that is in block. **This is a safety question to decide on purpose, not a convenience.**
+- **More parameters and settings** in the app:
+  - hours of operation, the stove's date and time, winter/summer mode;
+  - user calibrations ("tarature utente");
+  - technical water temperature, water pressure;
+  - ducted-air temperature and the room temperature near it.
+- **Voice assistants and smart home**: Alexa and Google, ignition driven by an external smart thermostat (about 4).
+- **Implausible readings**: flame temperature stuck at 212 or 15071 °C. One user set water to 65 °C but the stove "goes to 70". Consequences for us: validate readings and explain setpoint behaviour.
+- **Login**: the session expires and asks for the password again, activation emails never arrive. Not relevant to us beyond keeping our own session stable.
+- From the App Store and sibling apps:
+  - standby can't be managed from the app;
+  - users ask for an operation history;
+  - one asks to read and adjust the buffer-tank temperature.
+- Positive notes: when it connects, it does the basics, namely remote ignition, power and water temperature, and the weekly on/off schedule.

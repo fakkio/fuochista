@@ -6,6 +6,8 @@ Unofficial app to control and automate the home's pellet boiler stove (Klover, o
 
 - [docs/context.md](docs/context.md): the house, the stove, the platform, what already exists and the open decisions.
 - [docs/ideas.md](docs/ideas.md): the feature brainstorm the first release will be picked from.
+- [docs/roadmap.md](docs/roadmap.md): the milestones, their scope and the per-milestone process.
+- [GLOSSARY.md](GLOSSARY.md): the project's domain terms.
 
 ## Rules
 

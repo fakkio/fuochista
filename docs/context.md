@@ -23,7 +23,7 @@ It doesn't talk to external thermostats or sensors either.
 ## The stove
 
 - Klover **pellet boiler stove** (hydro pellet stove; exact model still to be noted).
-- Heats the basement by radiation and convection, plus the fan. The user **keeps the fan off** because the basement is already very warm without it.
+- Heats the basement by radiation and convection, plus the fan. The user **keeps the fan off** because the basement is already very warm without it. The official app can't set the fan to OFF (its minimum is 1), so the user switches it off from the stove's panel. Whether the cloud API accepts fan = 0 is still to be verified.
 - Heats the water for the radiators of the whole house.
 - Consequence: the stove's room probe (if any) measures the basement, the warmest room. Regulating comfort in the rest of the house needs sensors in the other zones.
 
@@ -39,7 +39,13 @@ It doesn't talk to external thermostats or sensors either.
 
 ## Available infrastructure
 
-- A **VPS** to run the always-on service (programs, automations). OS and resources still to be noted.
+- A **VPS** to run the always-on service (programs, automations), checked on 2026-11-25:
+  - **System**: Debian 12 (bookworm), 1 vCPU, 1.9 GB RAM, no swap. About 11 GB of the 40 GB disk are free (72% used).
+  - **Docker**: Docker 29 and Docker Compose v5 are installed.
+  - **Software that is old or missing**: Node 18, which is end-of-life, and Python 3.11 on the host. Fuochista runs in containers, so it doesn't depend on them. certbot is not installed.
+  - **nginx 1.22**: listens on 80 and 443 and has only the `default` site enabled. It is not yet clear where the certificates come from.
+  - The user owns several domains, so Fuochista will get a subdomain.
+  - Before deploying, the user will have the agent update the system and harden its basic security.
 - Control goes through the Micronova cloud, so the service doesn't have to live in the house.
 - But the VPS can't see the home network: any local sensors (Zigbee, Wi-Fi) need the vendor's cloud service or a link between house and VPS (e.g. Tailscale).
 - Discarded idea: a second Claude session on the VPS talking to this one. It's simpler for the agent to work on the VPS over SSH.
@@ -49,12 +55,28 @@ It doesn't talk to external thermostats or sensors either.
 - No smart thermostat at the moment; the user is willing to buy one.
 - Emerging direction: **temperature sensors** (e.g. Shelly H&T) in the day and night zones, with our own logic, are probably enough instead of a full thermostat.
 
+## Decisions (process grilling, 2026-11-25)
+
+- **Audience**: the household first (two people, one stove, one account), published as **open source** so that anyone can clone and self-host it. A hosted product for other Micronova owners may come later, after checking the legal side.
+- **Shape**: our own always-on service on the VPS + a **PWA** as the interface. Both users have Android phones. Telegram may come later as a second channel. See [ADR 0001](adr/0001-own-service-and-pwa-over-home-assistant.md).
+- **License and legal**: MIT. The README states that the project is unaffiliated with Klover and Micronova, comes with no warranty, and is used at your own risk. No vendor branding. The repo goes public after M0, once the history is checked for anything sensitive.
+- **Deployment**: one household per installation, `docker compose up` + `.env`.
+- **Multiple stoves**: the model supports several stoves per account from the start. The UI is designed for one, and the two-stove case is covered only by tests against a fake cloud (untested on real hardware).
+- **Stack**: TypeScript for both the service and the PWA. M0 uses py-agua-iot in Python as-is, then the client is rewritten in TS from `docs/platform.md`.
+- **Access**: public over HTTPS with a login per user (not Tailscale).
+- **Onboarding**: the stove's first Wi-Fi setup is done with the official app; Fuochista assumes the stove is already on the cloud.
+- **No parity milestone**: the official app stays as a fallback; Fuochista starts from what's missing plus the essential manual controls.
+- **Programs live in Fuochista** (see `GLOSSARY.md`): the stove's Chrono stays off, the service sends the commands at the right time, and manual commands from outside (official app, panel) are respected.
+- **Milestones are vertical slices**, each deployed and actually used at home; hardware is bought only when a milestone needs it.
+- **M0 is a feasibility spike** (read everything, one controlled write, fan = 0), findings in `docs/platform.md`. The stack is confirmed after it.
+- **No buffer tank**: water temperature is the only temperature set; the stove modulates power to hold it.
+
 ## Open decisions
 
-1. **Architecture**: Home Assistant in Docker on the VPS + the existing integration (recommended in the first session), or our own Python service with a web interface.
+1. ~~Architecture~~: decided, see above.
 2. **Sensors**: which to buy and how to get their data to the VPS.
-3. **Official app reviews**: the Play Store doesn't show them to automated access. The user pastes them, or we read them with Claude in Chrome. They're needed to complete the list of improvements.
-4. **First release**: which ideas from [ideas.md](ideas.md) make up the first version.
+3. ~~Official app reviews~~: read, see section 10 of [ideas.md](ideas.md).
+4. ~~First release~~: see [roadmap.md](roadmap.md).
 
 ## Proposed next step
 
