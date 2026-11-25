@@ -64,7 +64,8 @@ It doesn't talk to external thermostats or sensors either.
 - **Multiple stoves**: the model supports several stoves per account from the start. The UI is designed for one, and the two-stove case is covered only by tests against a fake cloud (untested on real hardware).
 - **Stack**: TypeScript for both the service and the PWA. M0 uses py-agua-iot in Python as-is, then the client is rewritten in TS from `docs/platform.md`.
 - **Access**: public over HTTPS with a login per user (not Tailscale).
-- **Onboarding**: the stove's first Wi-Fi setup is done with the official app; Fuochista assumes the stove is already on the cloud.
+- **Onboarding**: the stove must already be registered on the Micronova cloud through the official app (account, Wi-Fi module setup, product registration). This is a stated prerequisite in the README. When the stove stays unreachable for a long time, Fuochista's notification suggests reconfiguring the module's Wi-Fi from the official app.
+- **Bluetooth is out of scope**. Bluetooth control is already available from the official app. Everything Fuochista adds needs the VPS, so it can't work anyway while the module is offline. M0 only notes a local or Bluetooth protocol in `docs/platform.md` if it happens to turn one up.
 - **No parity milestone**: the official app stays as a fallback; Fuochista starts from what's missing plus the essential manual controls.
 - **Programs live in Fuochista** (see `GLOSSARY.md`): the stove's Chrono stays off, the service sends the commands at the right time, and manual commands from outside (official app, panel) are respected.
 - **Milestones are vertical slices**, each deployed and actually used at home; hardware is bought only when a milestone needs it.

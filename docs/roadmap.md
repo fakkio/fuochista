@@ -36,6 +36,10 @@ Every milestone also exists as a GitHub Milestone grouping its spec and tickets.
 - Weather (M6) comes before sensors (M8) because it needs no hardware.
 - History (M3) comes before pellets (M4) because consumption is estimated from the history.
 
+## Out of scope
+
+- **Bluetooth or local control**, including the first Wi-Fi setup of the module: the official app already does it. Every Fuochista feature needs the VPS and the cloud, so a local path wouldn't keep them working.
+
 ## Risks
 
 - **Unofficial API**: the vendor can change or block it at any time. The reviews show a cloud that is often unreliable.
