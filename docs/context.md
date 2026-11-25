@@ -22,7 +22,7 @@ It doesn't talk to external thermostats or sensors either.
 
 ## The stove
 
-- Klover **pellet boiler stove** (hydro pellet stove; exact model still to be noted).
+- Klover **Style 180** pellet boiler stove (hydro pellet stove).
 - Heats the basement by radiation and convection, plus the fan. The user **keeps the fan off** because the basement is already very warm without it. The official app can't set the fan to OFF (its minimum is 1), so the user switches it off from the stove's panel. Whether the cloud API accepts fan = 0 is still to be verified.
 - Heats the water for the radiators of the whole house.
 - Consequence: the stove's room probe (if any) measures the basement, the warmest room. Regulating comfort in the rest of the house needs sensors in the other zones.
