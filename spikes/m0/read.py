@@ -20,13 +20,17 @@ CUSTOMER_CODE = "143789"
 OUT = Path(__file__).parent / "out"
 
 
-def main() -> int:
+def load_credentials() -> tuple[str, str]:
     load_dotenv(Path(__file__).parent / ".env")
     email = os.environ.get("KLOVER_EMAIL")
     password = os.environ.get("KLOVER_PASSWORD")
     if not email or not password:
-        print("Set KLOVER_EMAIL and KLOVER_PASSWORD in spikes/m0/.env")
-        return 1
+        sys.exit("Set KLOVER_EMAIL and KLOVER_PASSWORD in spikes/m0/.env")
+    return email, password
+
+
+def main() -> int:
+    email, password = load_credentials()
 
     print("Logging in...")
     try:
