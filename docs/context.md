@@ -50,10 +50,10 @@ It doesn't talk to external thermostats or sensors either.
 - But the VPS can't see the home network: any local sensors (Zigbee, Wi-Fi) need the vendor's cloud service or a link between house and VPS (e.g. Tailscale).
 - Discarded idea: a second Claude session on the VPS talking to this one. It's simpler for the agent to work on the VPS over SSH.
 
-## Thermostat and sensors
+## Temperature sensors
 
-- No smart thermostat at the moment; the user is willing to buy one.
-- Emerging direction: **temperature sensors** (e.g. Shelly H&T) in the day and night zones, with our own logic, are probably enough instead of a full thermostat.
+- What the user meant from the start is a **smart thermometer** (a temperature sensor), not a thermostat: Fuochista holds the regulation logic itself. No sensor at the moment; the user is willing to buy them when a milestone needs them (M8).
+- Direction: sensors such as the Shelly H&T in the day and night zones, readable from the VPS (through the vendor's cloud or another link between house and VPS).
 
 ## Decisions (process grilling, 2026-11-25)
 
