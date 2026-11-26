@@ -1,0 +1,2 @@
+py-agua-iot==0.0.22
+python-dotenv==1.0.1
