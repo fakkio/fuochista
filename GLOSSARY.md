@@ -23,3 +23,11 @@ _Avoid_: slot, phase, event
 **Water temperature**:
 The radiator water setpoint of the **Stove**. With no buffer tank, it is the only temperature the household sets, and the stove modulates its power to hold it.
 _Avoid_: boiler temperature, H2O
+
+**Active Program**:
+The one **Program** whose **Steps** Fuochista is currently following. Several Programs can be saved; only one is active, and it can be paused without being deleted.
+_Avoid_: current schedule, enabled program
+
+**Skipped Step**:
+A **Step** that could not be applied within its grace window (the cloud was unreachable or the service was down). It is not replayed later; the household is notified.
+_Avoid_: missed step, failed step
