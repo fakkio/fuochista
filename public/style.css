@@ -25,3 +25,14 @@ button {
 }
 
 .error { color: #dc2626; margin: 0; }
+
+.state { font-size: 1.5rem; font-weight: 600; margin: 0.5rem 0; }
+.state[data-state="on"], .state[data-state="starting"] { color: var(--accent); }
+.state[data-state="alarm"] { color: #dc2626; }
+
+.readings { display: grid; grid-template-columns: 1fr auto; gap: 0.4rem 1rem; margin: 1rem 0; }
+.readings dt { opacity: 0.75; }
+.readings dd { margin: 0; font-weight: 600; text-align: right; }
+
+.meta { font-size: 0.875rem; opacity: 0.75; }
+button:disabled { opacity: 0.6; }

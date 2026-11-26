@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Fuochista service with an installable PWA: household members created from the command line log in and stay logged in; Docker and Dokku deploy (#3).
+- Stove status screen: state, power, fan, water temperature setpoint and actual, time of the last read; read on opening, on "refresh", and every 5 minutes with the Stove off or 2 with it on, through a TypeScript Agua IOT client with a cached register map (#4).
 
 ## [0.1.1] - 2026-11-26
 

@@ -45,7 +45,7 @@ if (!username) {
   console.error("usage: npm run create-user -- <username>   (password prompted, piped on stdin, or FUOCHISTA_PASSWORD)");
   process.exit(1);
 }
-const db = openDatabase(loadConfig({ requireSecret: false }).databasePath);
+const db = openDatabase(loadConfig({ requireSecret: false, requireCloud: false }).databasePath);
 try {
   await createUser(db, username, await readPassword());
   console.log(`user "${username.trim()}" created`);

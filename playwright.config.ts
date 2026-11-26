@@ -17,6 +17,7 @@ export default defineConfig({
       SESSION_SECRET: "e2e-session-secret-at-least-32-characters",
       SECURE_COOKIES: "false",
       FUOCHISTA_PASSWORD: E2E_USER.password,
+      FAKE_CLOUD: "true",
     },
   },
 });

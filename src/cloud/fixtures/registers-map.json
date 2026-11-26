@@ -1,0 +1,730 @@
+{
+  "device_registers_map": {
+    "registers_map": [
+      {
+        "id": "map-0",
+        "registers": [
+          {
+            "reg_key": "alarms_enable",
+            "reg_type": "ENABLE",
+            "offset": 33,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 255,
+            "mask": 255
+          },
+          {
+            "reg_key": "alarms_get",
+            "reg_type": "GET",
+            "offset": 51,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 255,
+            "mask": 65535
+          },
+          {
+            "reg_key": "calendar_day_set",
+            "reg_type": "SET",
+            "offset": 33019,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 1,
+            "set_max": 31,
+            "mask": 65535
+          },
+          {
+            "reg_key": "calendar_day_week_set",
+            "reg_type": "SET",
+            "offset": 33016,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 1,
+            "set_max": 7,
+            "mask": 65535
+          },
+          {
+            "reg_key": "calendar_month_set",
+            "reg_type": "SET",
+            "offset": 33020,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 1,
+            "set_max": 12,
+            "mask": 65535
+          },
+          {
+            "reg_key": "calendar_year_set",
+            "reg_type": "SET",
+            "offset": 33021,
+            "formula": "#+2000",
+            "formula_inverse": "#-2000",
+            "format_string": "{0}",
+            "set_min": 15,
+            "set_max": 50,
+            "mask": 65535
+          },
+          {
+            "reg_key": "chrono_general_enable_set",
+            "reg_type": "SET",
+            "offset": 32844,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p1_day_friday_set",
+            "reg_type": "SET",
+            "offset": 32855,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p1_day_monday_set",
+            "reg_type": "SET",
+            "offset": 32851,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p1_day_saturday_set",
+            "reg_type": "SET",
+            "offset": 32856,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p1_day_sunday_set",
+            "reg_type": "SET",
+            "offset": 32857,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p1_day_thursday_set",
+            "reg_type": "SET",
+            "offset": 32854,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p1_day_tuesday_set",
+            "reg_type": "SET",
+            "offset": 32852,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p1_day_wednesday_set",
+            "reg_type": "SET",
+            "offset": 32853,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p1_start_set",
+            "reg_type": "SET",
+            "offset": 32849,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 144,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p1_stop_set",
+            "reg_type": "SET",
+            "offset": 32850,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 144,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p2_day_friday_set",
+            "reg_type": "SET",
+            "offset": 32864,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p2_day_monday_set",
+            "reg_type": "SET",
+            "offset": 32860,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p2_day_saturday_set",
+            "reg_type": "SET",
+            "offset": 32865,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p2_day_sunday_set",
+            "reg_type": "SET",
+            "offset": 32866,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p2_day_thursday_set",
+            "reg_type": "SET",
+            "offset": 32863,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p2_day_tuesday_set",
+            "reg_type": "SET",
+            "offset": 32861,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p2_day_wednesday_set",
+            "reg_type": "SET",
+            "offset": 32862,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p2_start_set",
+            "reg_type": "SET",
+            "offset": 32858,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 144,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p2_stop_set",
+            "reg_type": "SET",
+            "offset": 32859,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 144,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p3_day_friday_set",
+            "reg_type": "SET",
+            "offset": 32873,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p3_day_monday_set",
+            "reg_type": "SET",
+            "offset": 32869,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p3_day_saturday_set",
+            "reg_type": "SET",
+            "offset": 32874,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p3_day_sunday_set",
+            "reg_type": "SET",
+            "offset": 32875,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p3_day_thursday_set",
+            "reg_type": "SET",
+            "offset": 32872,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p3_day_tuesday_set",
+            "reg_type": "SET",
+            "offset": 32870,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p3_day_wednesday_set",
+            "reg_type": "SET",
+            "offset": 32871,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p3_start_set",
+            "reg_type": "SET",
+            "offset": 32867,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 144,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p3_stop_set",
+            "reg_type": "SET",
+            "offset": 32868,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 144,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p4_day_friday_set",
+            "reg_type": "SET",
+            "offset": 32882,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p4_day_monday_set",
+            "reg_type": "SET",
+            "offset": 32878,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p4_day_saturday_set",
+            "reg_type": "SET",
+            "offset": 32883,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p4_day_sunday_set",
+            "reg_type": "SET",
+            "offset": 32884,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p4_day_thursday_set",
+            "reg_type": "SET",
+            "offset": 32881,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p4_day_tuesday_set",
+            "reg_type": "SET",
+            "offset": 32879,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p4_day_wednesday_set",
+            "reg_type": "SET",
+            "offset": 32880,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p4_start_set",
+            "reg_type": "SET",
+            "offset": 32876,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 144,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_p4_stop_set",
+            "reg_type": "SET",
+            "offset": 32877,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 144,
+            "mask": 255
+          },
+          {
+            "reg_key": "chrono_week_enable_set",
+            "reg_type": "SET",
+            "offset": 32848,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 1,
+            "mask": 255
+          },
+          {
+            "reg_key": "clock_hour_set",
+            "reg_type": "SET",
+            "offset": 33017,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 1,
+            "set_max": 23,
+            "mask": 65535
+          },
+          {
+            "reg_key": "clock_minute_set",
+            "reg_type": "SET",
+            "offset": 33018,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 1,
+            "set_max": 59,
+            "mask": 65535
+          },
+          {
+            "reg_key": "power_set",
+            "reg_type": "SET",
+            "offset": 32895,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 1,
+            "set_max": 5,
+            "mask": 255
+          },
+          {
+            "reg_key": "real_power_get",
+            "reg_type": "GET",
+            "offset": 52,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 255,
+            "mask": 65535
+          },
+          {
+            "reg_key": "status_get",
+            "reg_type": "GET",
+            "offset": 33,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 255,
+            "mask": 65535,
+            "enc_val": [
+              {
+                "lang": "ENG",
+                "description": "OFF",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "reg_key": "status_managed_get",
+            "reg_type": "GET",
+            "offset": 232,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 255,
+            "mask": 65535,
+            "enc_val": [
+              {
+                "lang": "ENG",
+                "description": "ON",
+                "value": 85
+              },
+              {
+                "lang": "ENG",
+                "description": "OFF",
+                "value": 170
+              }
+            ]
+          },
+          {
+            "reg_key": "status_managed_off_enable",
+            "reg_type": "ENABLE",
+            "offset": 33,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 65535,
+            "mask": 65535
+          },
+          {
+            "reg_key": "status_managed_on_enable",
+            "reg_type": "ENABLE",
+            "offset": 33,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 65535,
+            "mask": 65535
+          },
+          {
+            "reg_key": "temp_probe_k_get",
+            "reg_type": "GET",
+            "offset": 89,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0} °C",
+            "set_min": 0,
+            "set_max": 255,
+            "mask": 65535
+          },
+          {
+            "reg_key": "temp_water_boiler_enable",
+            "reg_type": "ENABLE",
+            "offset": 32828,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 3,
+            "mask": 255
+          },
+          {
+            "reg_key": "temp_water_boiler_get",
+            "reg_type": "GET",
+            "offset": 74,
+            "formula": "#/2",
+            "formula_inverse": "#*2",
+            "format_string": "{0} °C",
+            "set_min": 0,
+            "set_max": 255,
+            "mask": 255
+          },
+          {
+            "reg_key": "temp_water_boiler_set",
+            "reg_type": "SET",
+            "offset": 32897,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 45,
+            "set_max": 70,
+            "mask": 255
+          },
+          {
+            "reg_key": "temp_water_enable",
+            "reg_type": "ENABLE",
+            "offset": 32828,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 3,
+            "mask": 255
+          },
+          {
+            "reg_key": "temp_water_get",
+            "reg_type": "GET",
+            "offset": 3,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 255,
+            "mask": 255
+          },
+          {
+            "reg_key": "temp_water_puffer_enable",
+            "reg_type": "ENABLE",
+            "offset": 32828,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 0,
+            "set_max": 3,
+            "mask": 255
+          },
+          {
+            "reg_key": "temp_water_puffer_get",
+            "reg_type": "GET",
+            "offset": 74,
+            "formula": "#/2",
+            "formula_inverse": "#*2",
+            "format_string": "{0} °C",
+            "set_min": 0,
+            "set_max": 255,
+            "mask": 255
+          },
+          {
+            "reg_key": "temp_water_puffer_set",
+            "reg_type": "SET",
+            "offset": 32899,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 40,
+            "set_max": 75,
+            "mask": 255
+          },
+          {
+            "reg_key": "temp_water_set",
+            "reg_type": "SET",
+            "offset": 32896,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 55,
+            "set_max": 80,
+            "mask": 255
+          },
+          {
+            "reg_key": "vent_front_set",
+            "reg_type": "SET",
+            "offset": 32900,
+            "formula": "#",
+            "formula_inverse": "#",
+            "format_string": "{0}",
+            "set_min": 1,
+            "set_max": 6,
+            "mask": 255,
+            "enc_val": [
+              {
+                "lang": "ENG",
+                "description": "OFF",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

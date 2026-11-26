@@ -12,11 +12,23 @@
 <body>
   <header class="bar">
     <h1>Fuochista</h1>
-    <span id="user"></span>
+    <span id="greeting"></span>
     <button id="logout" type="button">Esci</button>
   </header>
   <main class="card">
-    <p>Ciao <strong id="greeting"></strong>. Qui arriverà lo stato della stufa.</p>
+    <section id="stove" aria-labelledby="stove-title">
+      <h2 id="stove-title">Stufa</h2>
+      <p class="state" data-state="" data-testid="state">…</p>
+      <dl class="readings">
+        <dt>Potenza</dt><dd data-testid="power">–</dd>
+        <dt>Ventola</dt><dd data-testid="fan">–</dd>
+        <dt>Temperatura acqua impostata</dt><dd data-testid="water-setpoint">–</dd>
+        <dt>Temperatura acqua attuale</dt><dd data-testid="water-temperature">–</dd>
+      </dl>
+      <p class="meta">Letto alle <span data-testid="read-at">–</span></p>
+      <p class="error" role="alert" data-testid="error" hidden></p>
+      <button id="refresh" type="button">Aggiorna</button>
+    </section>
   </main>
   <script src="/app.js" type="module"></script>
 </body>
