@@ -1,0 +1,27 @@
+:root {
+  color-scheme: light dark;
+  --accent: #c2410c;
+  font-family: system-ui, sans-serif;
+}
+
+body { margin: 0; padding: 1rem; }
+
+.bar { display: flex; align-items: center; gap: 1rem; }
+.bar h1 { flex: 1; margin: 0; font-size: 1.25rem; }
+
+.card { max-width: 28rem; margin: 2rem auto; }
+
+form { display: grid; gap: 1rem; }
+label { display: grid; gap: 0.25rem; }
+input { font: inherit; padding: 0.6rem; }
+
+button {
+  font: inherit;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: var(--accent);
+  color: white;
+}
+
+.error { color: #dc2626; margin: 0; }

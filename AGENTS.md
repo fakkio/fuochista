@@ -22,6 +22,10 @@ Unofficial app to control and automate the home's pellet boiler stove (Klover, o
 
 Everything written down is in English: code (identifiers, comments, non-user-facing strings), commit messages, issues, and every doc in the repo. Italian is for conversation with the user only.
 
+### Stack
+
+TypeScript run directly by Node (type stripping, no build step), Hono, `node:sqlite`, Vitest and Playwright. The PWA is plain HTML, CSS and JS. Never use Tailwind: the user dislikes it; write plain CSS.
+
 ### Branching (gitflow)
 
 Complex, multi-ticket work branches from `develop` (`feature/<slug>` / `bugfix/<slug>`) and merges back via gitflow; one-off work commits straight to `develop`. See `docs/agents/branching.md`.

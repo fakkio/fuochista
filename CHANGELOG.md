@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Fuochista service with an installable PWA: household members created from the command line log in and stay logged in; Docker and Dokku deploy (#3).
+
 ## [0.1.1] - 2026-11-26
 
 ### Added
