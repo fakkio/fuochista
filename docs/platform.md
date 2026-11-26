@@ -1,8 +1,8 @@
-# Platform
+# platform
 
 What the Micronova Agua IOT cloud allows for the household's **Stove**, as found by the M0 feasibility spike (#1). The spike scripts live in `spikes/m0/`.
 
-Status: reads verified on 2026-11-25. Writes and fan = 0 are still to be tested at the stove.
+Status: complete. Reads verified on 2026-11-25; writes and fan = 0 verified at the stove on 2026-11-26 (stove ON, user watching the panel).
 
 ## Stove
 
@@ -13,7 +13,7 @@ Status: reads verified on 2026-11-25. Writes and fan = 0 are still to be tested 
 
 - py-agua-iot 0.0.22 works with the Klover Home brand settings: API URL `https://klover.agua-iot.com`, customer code `143789`, default brand id `1`. The login worked on the first try.
 - Credentials are the official app's email and password. The client also sends a random unique id per installation.
-- The protocol is plain HTTPS + JSON with a JWT token. Nothing is hard to port to TypeScript so far.
+- The protocol is plain HTTPS + JSON with a JWT token. Nothing is hard to port: TypeScript is confirmed for the client.
 
 ## Read flow
 
@@ -54,13 +54,20 @@ The map has 63 registers. Types: `GET` (read), `SET` (writable setpoint), `ENABL
 
 There is no air temperature register (the library returns `None`). Nothing in the map reads the room either.
 
-## Open, to test at the stove
+## Write tests (2026-11-26)
 
-- Water setpoint +1 °C and restore: latency on the panel and in the cloud.
-- Fan = 0: the library refuses it on the client side (min 1). The test has to call the writing endpoint directly to see whether the cloud and the stove accept it.
+| Test | Result |
+|---|---|
+| `temp_water_set` 70 → 71 → 70 | Accepted. Write job completed in 1.4 s; the panel showed the change; the next cloud read (+32 s) reported it. |
+| `vent_front_set` 0 → 1 (through the library) | Accepted, the fan started. |
+| `vent_front_set` 1 → 0 (direct write, bypassing the library's min = 1) | **Accepted by the cloud and the stove**: the fan stopped. |
+
+The declared `set_min`/`set_max` are not enforced by the cloud, at least for the fan. Our client must keep its own ranges, and enforce them deliberately (0 allowed for the fan).
 
 ## Implications for M1
 
-- The fan does accept 0 as a stove state, since it reads 0 now. If the cloud also accepts writing it, a **Step** can turn the fan off.
+- A **Step** can turn the fan off (0), which the official app can't do.
+- A write takes ~1.5 s to be confirmed by the cloud job. Confirming that a command took effect needs one extra read afterwards.
+- Since the cloud doesn't enforce ranges, a wrong value would reach the stove: validation is Fuochista's job.
 - The stove's Chrono is active, with two programs. Following the decision that Fuochista keeps the Chrono off, it has to be switched off before Programs take over. Otherwise both will send commands.
 - Reads are asynchronous jobs that take a few seconds, so the cloud should not be polled often. Cache the register map.
