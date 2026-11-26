@@ -39,13 +39,13 @@ It doesn't talk to external thermostats or sensors either.
 
 ## Available infrastructure
 
-- A **VPS** to run the always-on service (programs, automations), checked on 2026-11-25:
-  - **System**: Debian 12 (bookworm), 1 vCPU, 1.9 GB RAM, no swap. About 11 GB of the 40 GB disk are free (72% used).
-  - **Docker**: Docker 29 and Docker Compose v5 are installed.
-  - **Software that is old or missing**: Node 18, which is end-of-life, and Python 3.11 on the host. Fuochista runs in containers, so it doesn't depend on them. certbot is not installed.
-  - **nginx 1.22**: listens on 80 and 443 and has only the `default` site enabled. It is not yet clear where the certificates come from.
-  - The user owns several domains, so Fuochista will get a subdomain.
-  - Before deploying, the user will have the agent update the system and harden its basic security.
+- A **VPS** to run the always-on service (programs, automations), checked and hardened on 2026-11-26:
+  - **System**: Debian 12 (bookworm), 1 vCPU, 1.9 GB RAM + 2 GB swap, 40 GB disk (~38% used).
+  - **Dokku 0.38** runs on it and owns nginx (ports 80/443), with the letsencrypt, postgres and redis plugins. The global vhost is `lazzaroni.io`. It already hosts `lireddit-api` (a study project, kept) with its Postgres and Redis.
+  - Fuochista's domain: `fuochista.lazzaroni.io` (DNS A record in place).
+  - **Access**: SSH key only, as `fakkio` (sudo with password). Root login and password logins are off. fail2ban guards SSH: several failed keys from one IP get it banned for a while, so connect through the `jeflab-*` aliases. The provider's `debian` user is locked.
+  - **Firewall**: nftables table `inet host_fw` (systemd unit `host-firewall`), input dropped except 22, 80, 443, ICMP and Docker bridges. It doesn't flush the ruleset, so Docker's and fail2ban's tables stay.
+  - **Updates**: `unattended-upgrades` applies security updates automatically.
 - Control goes through the Micronova cloud, so the service doesn't have to live in the house.
 - But the VPS can't see the home network: any local sensors (Zigbee, Wi-Fi) need the vendor's cloud service or a link between house and VPS (e.g. Tailscale).
 - Discarded idea: a second Claude session on the VPS talking to this one. It's simpler for the agent to work on the VPS over SSH.
@@ -60,7 +60,7 @@ It doesn't talk to external thermostats or sensors either.
 - **Audience**: the household first (two people, one stove, one account), published as **open source** so that anyone can clone and self-host it. A hosted product for other Micronova owners may come later, after checking the legal side.
 - **Shape**: our own always-on service on the VPS + a **PWA** as the interface. Both users have Android phones. Telegram may come later as a second channel. See [ADR 0001](adr/0001-own-service-and-pwa-over-home-assistant.md).
 - **License and legal**: MIT. The README states that the project is unaffiliated with Klover and Micronova, comes with no warranty, and is used at your own risk. No vendor branding. The repo goes public after M0, once the history is checked for anything sensitive.
-- **Deployment**: one household per installation, `docker compose up` + `.env`.
+- **Deployment**: one household per installation, `docker compose up` + `.env`. On the household's own VPS it is deployed as a Dokku app (see [ADR 0002](adr/0002-dokku-on-the-household-vps.md)).
 - **Multiple stoves**: the model supports several stoves per account from the start. The UI is designed for one, and the two-stove case is covered only by tests against a fake cloud (untested on real hardware).
 - **Stack**: TypeScript for both the service and the PWA. M0 uses py-agua-iot in Python as-is, then the client is rewritten in TS from `docs/platform.md`.
 - **Access**: public over HTTPS with a login per user (not Tailscale).
