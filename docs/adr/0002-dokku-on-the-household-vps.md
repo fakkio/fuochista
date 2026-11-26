@@ -6,3 +6,4 @@ On the household's VPS, Fuochista is deployed as a Dokku app (`git push`, TLS fr
 
 - Two deploy paths to keep working: Dokku (ours) and docker compose (everyone else). The image and the `.env` variables must be the same for both.
 - Deploys need the deployer's SSH key registered with `dokku ssh-keys:add`.
+- Until M1 deploys the real service, the `fuochista` app runs a placeholder image (`nginxdemos/hello`).

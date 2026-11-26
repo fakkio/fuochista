@@ -19,7 +19,7 @@ Every milestone also exists as a GitHub Milestone grouping its spec and tickets.
 | # | Milestone | Scope | Status |
 |---|---|---|---|
 | M0 | Feasibility | Read every parameter, one controlled write with the user at the stove, check that fan = 0 is accepted. Findings in `docs/platform.md`. The stack is confirmed after this. Spec: #1 (spike: no tickets, straight on `develop`). | Done (v0.1.0): reads, writes and fan = 0 all work; TypeScript confirmed |
-| Prep | VPS hardening | Before M1's first deploy: system and package updates, basic security (SSH, firewall, automatic updates, swap), HTTPS certificates for a Fuochista subdomain. Not needed for M0, which runs on the user's PC. | In progress: hardening done, HTTPS for `fuochista.lazzaroni.io` pending |
+| Prep | VPS hardening | Before M1's first deploy: system and package updates, basic security (SSH, firewall, automatic updates, swap), HTTPS certificates for a Fuochista subdomain. Not needed for M0, which runs on the user's PC. | Done: hardened, Dokku app `fuochista` with a placeholder and Let's Encrypt on `fuochista.lazzaroni.io` |
 | M1 | Programs | Always-on service on the VPS + PWA. Stove status, essential manual controls, weekly multi-step **Programs** (power, fan including off, water temperature per **Step**), stove protections (minimum times, cloud call limits), confirmation that each command took effect, notifications for alarms and an unreachable cloud. | Not started |
 | M2 | Calendar | Reusable profiles, exceptions (holidays, vacations), temporary overrides ("one more hour", "skip the next shutdown"). | Not started |
 | M3 | History | Log of status and commands, charts, hour counter, "who changed what". | Not started |
