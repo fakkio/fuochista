@@ -1,4 +1,4 @@
-import { CloudError, stateFromCodes, type Cloud, type StoveInfo, type StoveReading } from "./cloud.ts";
+import { CloudError, CloudUnreachableError, stateFromCodes, type Cloud, type StoveInfo, type StoveReading } from "./cloud.ts";
 
 /** Klover Home brand settings, verified by the M0 spike (docs/platform.md). */
 const API_URL = "https://klover.agua-iot.com";
@@ -71,6 +71,7 @@ export function createAguaClient(options: AguaClientOptions): Cloud {
   let refreshToken: string | null = null;
   let expiresAt = 0;
   let devices: Map<string, Device> | null = null;
+  let signedUp = false;
 
   const baseHeaders = () => ({
     Accept: "application/json, text/javascript, */*; q=0.01",
@@ -80,15 +81,33 @@ export function createAguaClient(options: AguaClientOptions): Cloud {
     customer_code: CUSTOMER_CODE,
   });
 
-  async function post(path: string, body: unknown, headers: Record<string, string>) {
+  async function send(method: "GET" | "POST", path: string, body: unknown, headers: Record<string, string>) {
     try {
-      return await fetch(apiUrl + path, { method: "POST", headers, body: JSON.stringify(body) });
+      const init = method === "POST" ? { method, headers, body: JSON.stringify(body) } : { method, headers };
+      return await fetch(apiUrl + path, init);
     } catch (err) {
-      throw new CloudError(`cloud unreachable (${path}): ${(err as Error).message}`);
+      throw new CloudUnreachableError(`cloud unreachable (${path}): ${(err as Error).message}`);
     }
   }
 
+  const post = (path: string, body: unknown, headers: Record<string, string>) => send("POST", path, body, headers);
+
+  /** Registers this installation's app id once per process, then logs in. */
   async function login() {
+    if (!signedUp) await signUp();
+    const res = await post(
+      "/userLogin",
+      { email: options.email, password: options.password },
+      { ...baseHeaders(), local: "true", Authorization: options.appId },
+    );
+    if (res.status !== 200) throw new CloudError(`login failed (${res.status})`);
+    const json = (await res.json()) as { token: string; refresh_token: string };
+    token = json.token;
+    refreshToken = json.refresh_token;
+    expiresAt = tokenExpiry(token);
+  }
+
+  async function signUp() {
     const signup = await post(
       "/appSignup",
       {
@@ -103,16 +122,7 @@ export function createAguaClient(options: AguaClientOptions): Cloud {
       baseHeaders(),
     );
     if (signup.status !== 201) throw new CloudError(`app sign-up failed (${signup.status})`);
-    const res = await post(
-      "/userLogin",
-      { email: options.email, password: options.password },
-      { ...baseHeaders(), local: "true", Authorization: options.appId },
-    );
-    if (res.status !== 200) throw new CloudError(`login failed (${res.status})`);
-    const json = (await res.json()) as { token: string; refresh_token: string };
-    token = json.token;
-    refreshToken = json.refresh_token;
-    expiresAt = tokenExpiry(token);
+    signedUp = true;
   }
 
   async function refresh() {
@@ -130,12 +140,7 @@ export function createAguaClient(options: AguaClientOptions): Cloud {
   async function call<T>(method: "GET" | "POST", path: string, body: unknown = {}, retried = false): Promise<T> {
     await ensureToken();
     const headers = { ...baseHeaders(), local: "false", Authorization: token! };
-    let res: Response;
-    try {
-      res = await fetch(apiUrl + path, method === "POST" ? { method, headers, body: JSON.stringify(body) } : { method, headers });
-    } catch (err) {
-      throw new CloudError(`cloud unreachable (${path}): ${(err as Error).message}`);
-    }
+    const res = await send(method, path, body, headers);
     if (res.status === 401 && !retried) {
       await refresh();
       return call(method, path, body, true);
@@ -144,8 +149,9 @@ export function createAguaClient(options: AguaClientOptions): Cloud {
     return (await res.json()) as T;
   }
 
-  async function loadDevices(): Promise<Map<string, Device>> {
-    if (devices) return devices;
+  /** Fetches the account's devices; known ones keep their cached register map. */
+  async function loadDevices({ fresh = false } = {}): Promise<Map<string, Device>> {
+    if (devices && !fresh) return devices;
     const list = await call<{ device: { id_device: string; id_product: string; name: string }[] }>("POST", "/deviceList");
     const found = new Map<string, Device>();
     for (const d of list.device) {
@@ -154,6 +160,7 @@ export function createAguaClient(options: AguaClientOptions): Cloud {
         id_product: d.id_product,
       });
       found.set(d.id_device, {
+        ...devices?.get(d.id_device),
         id_device: d.id_device,
         id_product: d.id_product,
         name: d.name,
@@ -165,7 +172,8 @@ export function createAguaClient(options: AguaClientOptions): Cloud {
   }
 
   async function device(stoveId: string): Promise<Device> {
-    const d = (await loadDevices()).get(stoveId);
+    // A Stove added to the account after start-up shows up on a fresh device list.
+    const d = (await loadDevices()).get(stoveId) ?? (await loadDevices({ fresh: true })).get(stoveId);
     if (!d) throw new CloudError(`unknown stove ${stoveId}`);
     return d;
   }
@@ -190,7 +198,11 @@ export function createAguaClient(options: AguaClientOptions): Cloud {
       const res = await call<{ jobAnswerStatus: string; jobAnswerData?: { Items: number[]; Values: number[] } }>(
         "GET",
         `/deviceJobStatus/${idRequest}`,
-      ).catch(() => null);
+      ).catch((err) => {
+        // A failed poll is retried, but an unreachable cloud is not going to answer the next one either.
+        if (err instanceof CloudUnreachableError) throw err;
+        return null;
+      });
       if (res?.jobAnswerStatus === "completed") return res;
     }
     throw new CloudError(`job ${idRequest} did not complete`);
@@ -198,7 +210,7 @@ export function createAguaClient(options: AguaClientOptions): Cloud {
 
   return {
     async listStoves(): Promise<StoveInfo[]> {
-      return [...(await loadDevices()).values()].map((d) => ({ id: d.id_device, name: d.name }));
+      return [...(await loadDevices({ fresh: true })).values()].map((d) => ({ id: d.id_device, name: d.name }));
     },
 
     async readStatus(stoveId: string): Promise<StoveReading> {

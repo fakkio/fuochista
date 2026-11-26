@@ -52,3 +52,6 @@ export function stateFromCodes(statusCode: number, alarmCode: number): StoveStat
 
 /** A cloud call failed: unreachable, rejected, or a job that never completed. */
 export class CloudError extends Error {}
+
+/** The cloud could not be reached at all (network down, DNS, timeout). */
+export class CloudUnreachableError extends CloudError {}

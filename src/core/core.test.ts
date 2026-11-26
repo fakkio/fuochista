@@ -74,6 +74,17 @@ describe("Stove status", () => {
     expect(cloud.reads("s1")).toBe(3);
   });
 
+  it("answers on-demand reads from the last reading when it is under 30 seconds old", async () => {
+    const { core, cloud, clock } = await setup();
+    await core.refresh("s1"); // right after the start-up read
+    await clock.advance(29_000);
+    await core.refresh("s1");
+    expect(cloud.reads("s1")).toBe(1);
+    await clock.advance(1_000);
+    await core.refresh("s1");
+    expect(cloud.reads("s1")).toBe(2);
+  });
+
   it("keeps the last reading and reports the error when the cloud is unreachable", async () => {
     const { core, cloud, clock } = await setup();
     const firstRead = clock.now();
@@ -93,11 +104,12 @@ describe("Stove status", () => {
       { id: "s1", name: "Basement" },
       { id: "s2", name: "Cabin" },
     ]);
+    await clock.advance(MIN);
     cloud.setState("s2", { statusCode: 4 });
     await core.refresh("s2");
-    await clock.advance(4 * MIN);
+    await clock.advance(3 * MIN);
     expect(cloud.reads("s1")).toBe(1);
-    expect(cloud.reads("s2")).toBe(4); // start-up, refresh, +2, +4
+    expect(cloud.reads("s2")).toBe(3); // start-up, refresh at +1, then on: +3
     expect(core.stoves().map((s) => [s.id, s.reading?.state])).toEqual([
       ["s1", "off"],
       ["s2", "on"],

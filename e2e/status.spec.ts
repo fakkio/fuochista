@@ -1,11 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { E2E_USER } from "./user.ts";
+import { logIn } from "./user.ts";
 
 test("shows the Stove status read from the fake cloud, and refreshes it", async ({ page }) => {
-  await page.goto("/login");
-  await page.getByLabel("Utente").fill(E2E_USER.username);
-  await page.getByLabel("Password").fill(E2E_USER.password);
-  await page.getByRole("button", { name: "Accedi" }).click();
+  await logIn(page);
   await expect(page).toHaveURL(/\/$/);
 
   // The fake cloud's Stove starts off, power 3, fan 3, setpoint 70 °C, water at 40 °C.

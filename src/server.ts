@@ -1,8 +1,7 @@
-import { randomUUID } from "node:crypto";
 import { serve } from "@hono/node-server";
 import { createApp } from "./app.ts";
 import { loadConfig, loadEnvFile } from "./config.ts";
-import { openDatabase } from "./db.ts";
+import { installationId, openDatabase } from "./db.ts";
 import { createAguaClient } from "./cloud/agua-client.ts";
 import { createFakeCloud } from "./cloud/fake-cloud.ts";
 import { createCore } from "./core/core.ts";
@@ -15,7 +14,7 @@ const db = openDatabase(config.databasePath);
 const cloud =
   config.cloud.kind === "fake"
     ? createFakeCloud()
-    : createAguaClient({ email: config.cloud.email, password: config.cloud.password, appId: randomUUID() });
+    : createAguaClient({ email: config.cloud.email, password: config.cloud.password, appId: installationId(db) });
 const core = createCore({ cloud, clock: systemClock });
 await core.start();
 const app = createApp({ db, sessionSecret: config.sessionSecret, secureCookies: config.secureCookies, core });

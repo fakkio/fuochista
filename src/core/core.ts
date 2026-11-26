@@ -5,6 +5,8 @@ const MIN = 60_000;
 /** Read cadence: sparing when the Stove is off, closer while it is doing something. */
 export const READ_INTERVAL_OFF_MS = 5 * MIN;
 export const READ_INTERVAL_ACTIVE_MS = 2 * MIN;
+/** On-demand reads closer than this to the last one reuse it, so taps and open tabs don't hammer the cloud. */
+export const MIN_ON_DEMAND_READ_GAP_MS = 30_000;
 const ACTIVE_STATES = new Set<StoveState>(["starting", "on", "shutting_down"]);
 
 export interface StoveView {
@@ -92,11 +94,13 @@ export function createCore({ cloud, clock }: CoreOptions) {
       return [...slots.values()].map((s) => s.view);
     },
 
-    /** Reads a Stove now (app opened, "refresh" pressed); the cadence restarts from this read. */
+    /** Reads a Stove now (app opened, "refresh" pressed) unless the last read is fresh; the cadence restarts from a new read. */
     refresh(stoveId: string): Promise<StoveView> {
       const slot = slots.get(stoveId);
       if (!slot) return Promise.reject(new UnknownStoveError(`unknown stove ${stoveId}`));
-      return read(slot);
+      const { readAt, error } = slot.view;
+      const fresh = error === null && readAt !== null && clock.now() - readAt < MIN_ON_DEMAND_READ_GAP_MS;
+      return fresh ? Promise.resolve(slot.view) : read(slot);
     },
   };
 }

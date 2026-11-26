@@ -17,22 +17,29 @@ interface Call {
   headers: Record<string, string>;
 }
 
-function fakeAgua({ pendingPolls = 2, devices = ["dev-a"] } = {}) {
+function fakeAgua({ pendingPolls = 2, devices = ["dev-a"], tokenLifetimeS = 3600 } = {}) {
   const calls: Call[] = [];
   let polls = 0;
+  /** Paths that answer 401 once (an expired session), or fail at the network level. */
+  const unauthorizedOnce = new Set<string>();
+  const unreachable = new Set<string>();
   const reply = (status: number, body: unknown) =>
     new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
   const fetch = async (input: string | URL | Request, init?: RequestInit) => {
     const url = new URL(String(input));
     const body = init?.body ? JSON.parse(String(init.body)) : undefined;
     calls.push({ path: url.pathname, body, headers: init?.headers as Record<string, string> });
+    if (unreachable.has(url.pathname)) throw new TypeError("fetch failed");
+    if (unauthorizedOnce.delete(url.pathname)) return reply(401, {});
     switch (url.pathname) {
       case "/appSignup":
         return reply(201, {});
       case "/userLogin":
         return body.password === "secret"
-          ? reply(200, { token: jwt(Date.now() / 1000 + 3600), refresh_token: "r" })
+          ? reply(200, { token: jwt(Date.now() / 1000 + tokenLifetimeS), refresh_token: "r" })
           : reply(401, {});
+      case "/refreshToken":
+        return reply(201, { token: jwt(Date.now() / 1000 + 3600) });
       case "/deviceList":
         return reply(200, {
           device: devices.map((id, i) => ({
@@ -57,7 +64,7 @@ function fakeAgua({ pendingPolls = 2, devices = ["dev-a"] } = {}) {
     }
     return reply(404, {});
   };
-  return { fetch, calls };
+  return { fetch, calls, devices, unauthorizedOnce, unreachable };
 }
 
 function client(fake: ReturnType<typeof fakeAgua>, password = "secret") {
@@ -117,6 +124,49 @@ describe("Agua IOT cloud client", () => {
     expect(count("/deviceGetRegistersMap")).toBe(1);
     expect(count("/userLogin")).toBe(1);
     expect(count("/deviceGetBufferReading")).toBe(3);
+  });
+
+  it("renews an expiring token without logging in again", async () => {
+    const fake = fakeAgua({ tokenLifetimeS: 30 }); // inside the renewal margin
+    const c = client(fake);
+    await c.readStatus("dev-a");
+    await c.readStatus("dev-a");
+    const count = (p: string) => fake.calls.filter((call) => call.path === p).length;
+    expect(count("/userLogin")).toBe(1);
+    expect(count("/refreshToken")).toBeGreaterThan(0);
+  });
+
+  it("renews the session and retries once when the cloud answers 401", async () => {
+    const fake = fakeAgua();
+    const c = client(fake);
+    await c.readStatus("dev-a");
+    fake.unauthorizedOnce.add("/deviceGetBufferReading");
+    expect((await c.readStatus("dev-a")).state).toBe("on");
+    expect(fake.calls.filter((call) => call.path === "/refreshToken")).toHaveLength(1);
+  });
+
+  it("signs the installation up once, even when it has to log in again", async () => {
+    const fake = fakeAgua({ tokenLifetimeS: 30 });
+    fake.unauthorizedOnce.add("/refreshToken"); // a refused renewal forces a new login
+    await client(fake).readStatus("dev-a");
+    expect(fake.calls.filter((call) => call.path === "/userLogin")).toHaveLength(2);
+    expect(fake.calls.filter((call) => call.path === "/appSignup")).toHaveLength(1);
+  });
+
+  it("stops polling the job as soon as the cloud is unreachable", async () => {
+    const fake = fakeAgua({ pendingPolls: 5 });
+    fake.unreachable.add("/deviceJobStatus/job-1");
+    await expect(client(fake).readStatus("dev-a")).rejects.toThrow(/unreachable/);
+    expect(fake.calls.filter((call) => call.path === "/deviceJobStatus/job-1")).toHaveLength(1);
+  });
+
+  it("finds a Stove added to the account after the first device list", async () => {
+    const fake = fakeAgua();
+    const c = client(fake);
+    expect(await c.listStoves()).toHaveLength(1);
+    fake.devices.push("dev-b");
+    expect((await c.readStatus("dev-b")).state).toBe("on");
+    expect((await c.listStoves()).map((s) => s.id)).toEqual(["dev-a", "dev-b"]);
   });
 
   it("fails when the job never completes", async () => {

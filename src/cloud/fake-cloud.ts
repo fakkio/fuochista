@@ -1,4 +1,4 @@
-import { CloudError, stateFromCodes, type Cloud, type StoveInfo, type StoveReading } from "./cloud.ts";
+import { CloudUnreachableError, CloudError, stateFromCodes, type Cloud, type StoveInfo, type StoveReading } from "./cloud.ts";
 
 type RawState = Omit<StoveReading, "state">;
 
@@ -20,6 +20,10 @@ export function createFakeCloud(stoves: StoveInfo[] = [{ id: "fake-1", name: "St
   const readCounts = new Map<string, number>();
   let reachable = true;
 
+  const ensureReachable = () => {
+    if (!reachable) throw new CloudUnreachableError("cloud unreachable");
+  };
+
   const stateOf = (id: string) => {
     const s = states.get(id);
     if (!s) throw new CloudError(`unknown stove ${id}`);
@@ -28,11 +32,11 @@ export function createFakeCloud(stoves: StoveInfo[] = [{ id: "fake-1", name: "St
 
   return {
     async listStoves() {
-      if (!reachable) throw new CloudError("cloud unreachable");
+      ensureReachable();
       return stoves.map((s) => ({ ...s }));
     },
     async readStatus(stoveId) {
-      if (!reachable) throw new CloudError("cloud unreachable");
+      ensureReachable();
       const s = stateOf(stoveId);
       readCounts.set(stoveId, (readCounts.get(stoveId) ?? 0) + 1);
       return { state: stateFromCodes(s.statusCode, s.alarmCode), ...s };

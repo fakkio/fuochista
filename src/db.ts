@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
@@ -16,6 +17,10 @@ const MIGRATIONS: string[] = [
      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
      expires_at INTEGER NOT NULL
    );`,
+  `CREATE TABLE settings (
+     key TEXT PRIMARY KEY,
+     value TEXT NOT NULL
+   );`,
 ];
 
 /** Opens the SQLite database at `path` (or ":memory:") and applies pending migrations. */
@@ -31,4 +36,10 @@ export function openDatabase(path: string): Database {
     db.exec("COMMIT");
   }
   return db;
+}
+
+/** This installation's random id, created once and kept across restarts (the cloud registers it as an app). */
+export function installationId(db: Database): string {
+  db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('installation_id', ?)").run(randomUUID());
+  return (db.prepare("SELECT value FROM settings WHERE key = 'installation_id'").get() as { value: string }).value;
 }

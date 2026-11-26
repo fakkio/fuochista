@@ -1,13 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { E2E_USER } from "./user.ts";
-
-async function logIn(page: import("@playwright/test").Page, password = E2E_USER.password) {
-  await page.goto("/");
-  await expect(page).toHaveURL(/\/login$/);
-  await page.getByLabel("Utente").fill(E2E_USER.username);
-  await page.getByLabel("Password").fill(password);
-  await page.getByRole("button", { name: "Accedi" }).click();
-}
+import { E2E_USER, logIn } from "./user.ts";
 
 test("logs in, survives a browser restart, and logs out", async ({ browser }) => {
   const context = await browser.newContext();
