@@ -37,7 +37,7 @@ Dokku commands from the dev machine run over SSH as `ssh dokku@<vps> <command>` 
 Then create the household accounts on the VPS:
 
 ```sh
-ssh -t dokku@<vps> run fuochista node src/cli/create-user.ts <username>   # type the password, then Ctrl-D
+ssh -t dokku@<vps> run fuochista node src/cli/create-user.ts <username>   # prompts for the password (hidden)
 ```
 
 The SQLite file lives in `/var/lib/dokku/data/storage/fuochista` on the host, so it survives redeploys. TLS comes from the letsencrypt plugin: it was enabled during the VPS prep; on a fresh app run `dokku letsencrypt:enable fuochista` after the first deploy.
