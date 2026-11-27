@@ -20,6 +20,10 @@ _Avoid_: schedule, chrono, timer
 One timed entry of a **Program**: at a given time, the state the **Stove** should be put in (on or off, power, fan, water temperature).
 _Avoid_: slot, phase, event
 
+**Day group**:
+A set of weekdays within a **Program** that share the same ordered list of **Steps**. Each weekday belongs to at most one day group of a Program.
+_Avoid_: day type, profile
+
 **Water temperature**:
 The radiator water setpoint of the **Stove**. With no buffer tank, it is the only temperature the household sets, and the stove modulates its power to hold it.
 _Avoid_: boiler temperature, H2O

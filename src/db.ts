@@ -21,6 +21,16 @@ const MIGRATIONS: string[] = [
      key TEXT PRIMARY KEY,
      value TEXT NOT NULL
    );`,
+  `CREATE TABLE programs (
+     id INTEGER PRIMARY KEY,
+     name TEXT NOT NULL,
+     day_groups TEXT NOT NULL
+   );
+   CREATE TABLE active_programs (
+     stove_id TEXT PRIMARY KEY,
+     program_id INTEGER NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
+     paused INTEGER NOT NULL DEFAULT 0
+   );`,
 ];
 
 /** Opens the SQLite database at `path` (or ":memory:") and applies pending migrations. */

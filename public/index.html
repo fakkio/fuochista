@@ -29,7 +29,25 @@
       <p class="error" role="alert" data-testid="error" hidden></p>
       <button id="refresh" type="button">Aggiorna</button>
     </section>
+    <section id="programs" aria-labelledby="programs-title">
+      <h2 id="programs-title">Programmi</h2>
+      <p class="meta" data-testid="active-program">Nessun programma attivo</p>
+      <button id="pause" type="button" hidden>Metti in pausa</button>
+      <ul id="program-list" class="programs"></ul>
+      <button id="new-program" type="button">Nuovo programma</button>
+      <form id="program-editor" aria-label="Programma" hidden>
+        <label>Nome <input name="name" required></label>
+        <div id="day-groups"></div>
+        <button id="add-group" type="button" class="secondary">Aggiungi gruppo di giorni</button>
+        <p class="error" role="alert" hidden></p>
+        <div class="actions">
+          <button type="submit">Salva</button>
+          <button id="cancel-edit" type="button" class="secondary">Annulla</button>
+        </div>
+      </form>
+    </section>
   </main>
   <script src="/app.js" type="module"></script>
+  <script src="/programs.js" type="module"></script>
 </body>
 </html>

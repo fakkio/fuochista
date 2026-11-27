@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fuochista service with an installable PWA: household members created from the command line log in and stay logged in; Docker and Dokku deploy (#3).
 - Stove status screen: state, power, fan, water temperature setpoint and actual, time of the last read; read on opening, on "refresh", and every 5 minutes with the Stove off or 2 with it on, through a TypeScript Agua IOT client with a cached register map (#4).
+- Program editor: create, edit and delete weekly Programs of day groups and Steps, validated against Fuochista's ranges and the 30-minute gap between ignition and shutdown (across midnight, day groups and the end of the week); choose a Stove's Active Program, pause and resume it. Programs don't run yet (#8).
 
 ## [0.1.1] - 2026-11-26
 
