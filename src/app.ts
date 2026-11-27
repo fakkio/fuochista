@@ -99,35 +99,6 @@ export function createApp({ db, sessionSecret, secureCookies = true, publicDir =
 
   app.get("/api/me", (c) => c.json({ username: c.get("username") }));
 
-  const programs = createProgramStore(db);
-  const parseProgramId = (raw: string) => (/^\d+$/.test(raw) ? Number(raw) : -1);
-  const readProgram = async (req: Request) => validateProgram(await req.json().catch(() => null));
-
-  app.get("/api/programs", (c) => c.json(programs.list()));
-
-  app.post("/api/programs", async (c) => {
-    const result = await readProgram(c.req.raw);
-    if (!result.ok) return c.json({ error: "invalid program", problems: result.problems }, 400);
-    return c.json(programs.create(result.program), 201);
-  });
-
-  app.get("/api/programs/:id", (c) => {
-    const program = programs.get(parseProgramId(c.req.param("id")));
-    return program ? c.json(program) : c.json({ error: "unknown program" }, 404);
-  });
-
-  app.put("/api/programs/:id", async (c) => {
-    const id = parseProgramId(c.req.param("id"));
-    const result = await readProgram(c.req.raw);
-    if (!result.ok) return c.json({ error: "invalid program", problems: result.problems }, 400);
-    if (!programs.update(id, result.program)) return c.json({ error: "unknown program" }, 404);
-    return c.json({ id, ...result.program });
-  });
-
-  app.delete("/api/programs/:id", (c) =>
-    programs.delete(parseProgramId(c.req.param("id"))) ? c.body(null, 204) : c.json({ error: "unknown program" }, 404),
-  );
-
   if (core) {
     app.get("/api/stoves", (c) => c.json(core.stoves().map(stoveJson)));
 
@@ -140,22 +111,57 @@ export function createApp({ db, sessionSecret, secureCookies = true, publicDir =
       }
     });
 
+    const programs = createProgramStore(db);
     const knownStove = (id: string) => core.stoves().some((s) => s.id === id);
+    const parseProgramId = (raw: string) => (/^\d+$/.test(raw) ? Number(raw) : null);
+    const readProgram = async (req: Request) => validateProgram(await req.json().catch(() => null));
+    const unknownProgram = () => ({ error: "unknown program" });
+
+    // Every route under a Stove answers 404 for a Stove the account doesn't have.
+    app.use("/api/stoves/:id/*", async (c, next) =>
+      knownStove(c.req.param("id")) ? next() : c.json({ error: "unknown stove" }, 404),
+    );
+
+    app.get("/api/stoves/:id/programs", (c) => c.json(programs.list(c.req.param("id"))));
+
+    app.post("/api/stoves/:id/programs", async (c) => {
+      const result = await readProgram(c.req.raw);
+      if (!result.ok) return c.json({ error: "invalid program", problems: result.problems }, 400);
+      return c.json(programs.create(c.req.param("id"), result.program), 201);
+    });
+
+    app.get("/api/stoves/:id/programs/:programId", (c) => {
+      const id = parseProgramId(c.req.param("programId"));
+      const program = id === null ? null : programs.get(c.req.param("id"), id);
+      return program ? c.json(program) : c.json(unknownProgram(), 404);
+    });
+
+    app.put("/api/stoves/:id/programs/:programId", async (c) => {
+      const id = parseProgramId(c.req.param("programId"));
+      if (id === null) return c.json(unknownProgram(), 404);
+      const result = await readProgram(c.req.raw);
+      if (!result.ok) return c.json({ error: "invalid program", problems: result.problems }, 400);
+      if (!programs.update(c.req.param("id"), id, result.program)) return c.json(unknownProgram(), 404);
+      return c.json({ id, ...result.program });
+    });
+
+    app.delete("/api/stoves/:id/programs/:programId", (c) => {
+      const id = parseProgramId(c.req.param("programId"));
+      return id !== null && programs.delete(c.req.param("id"), id) ? c.body(null, 204) : c.json(unknownProgram(), 404);
+    });
 
     app.get("/api/stoves/:id/active-program", (c) => {
-      const id = c.req.param("id");
-      return knownStove(id) ? c.json(programs.active(id)) : c.json({ error: "unknown stove" }, 404);
+      return c.json(programs.active(c.req.param("id")));
     });
 
     app.put("/api/stoves/:id/active-program", async (c) => {
       const id = c.req.param("id");
-      if (!knownStove(id)) return c.json({ error: "unknown stove" }, 404);
       const body: unknown = await c.req.json().catch(() => null);
       const { programId, paused = false } = (body ?? {}) as { programId?: unknown; paused?: unknown };
       if ((programId !== null && !Number.isInteger(programId)) || typeof paused !== "boolean") {
         return c.json({ error: "invalid active program" }, 400);
       }
-      if (programId !== null && !programs.get(programId as number)) return c.json({ error: "unknown program" }, 404);
+      if (programId !== null && !programs.get(id, programId as number)) return c.json(unknownProgram(), 404);
       programs.setActive(id, { programId: programId as number | null, paused: programId !== null && paused });
       return c.json(programs.active(id));
     });

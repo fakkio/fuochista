@@ -15,7 +15,7 @@ const WINTER = {
 
 async function setup() {
   const db = openDatabase(":memory:");
-  const core = createCore({ cloud: createFakeCloud([{ id: "s1", name: "Basement" }]), clock: createFakeClock(0) });
+  const core = createCore({ cloud: createFakeCloud([{ id: "s1", name: "Basement" }, { id: "s2", name: "Garage" }]), clock: createFakeClock(0) });
   await core.start();
   const app = createApp({ db, sessionSecret: SECRET, secureCookies: false, core });
   await createUser(db, "anna", "correct horse");
@@ -39,7 +39,7 @@ async function setup() {
 describe("programs API", () => {
   it("creates, lists, reads, edits and deletes Programs", async () => {
     const { call } = await setup();
-    const created = await call("POST", "/api/programs", WINTER);
+    const created = await call("POST", "/api/stoves/s1/programs", WINTER);
     expect(created.status).toBe(201);
     expect(created.json).toEqual({
       id: expect.any(Number),
@@ -47,38 +47,38 @@ describe("programs API", () => {
       dayGroups: [{ days: ["mon", "tue"], steps: [{ time: "06:00", on: true, power: 3 }, { time: "22:00", off: true }] }],
     });
     const id = created.json.id;
-    await call("POST", "/api/programs", { name: "Mezza stagione", dayGroups: [] });
+    await call("POST", "/api/stoves/s1/programs", { name: "Mezza stagione", dayGroups: [] });
 
-    expect((await call("GET", "/api/programs")).json.map((p: { name: string }) => p.name)).toEqual(["Inverno", "Mezza stagione"]);
-    expect((await call("GET", `/api/programs/${id}`)).json.name).toBe("Inverno");
+    expect((await call("GET", "/api/stoves/s1/programs")).json.map((p: { name: string }) => p.name)).toEqual(["Inverno", "Mezza stagione"]);
+    expect((await call("GET", `/api/stoves/s1/programs/${id}`)).json.name).toBe("Inverno");
 
-    const edited = await call("PUT", `/api/programs/${id}`, { ...WINTER, name: "Inverno rigido" });
+    const edited = await call("PUT", `/api/stoves/s1/programs/${id}`, { ...WINTER, name: "Inverno rigido" });
     expect(edited.status).toBe(200);
-    expect((await call("GET", `/api/programs/${id}`)).json.name).toBe("Inverno rigido");
+    expect((await call("GET", `/api/stoves/s1/programs/${id}`)).json.name).toBe("Inverno rigido");
 
-    expect((await call("DELETE", `/api/programs/${id}`)).status).toBe(204);
-    expect((await call("GET", `/api/programs/${id}`)).status).toBe(404);
-    expect((await call("GET", "/api/programs")).json).toHaveLength(1);
+    expect((await call("DELETE", `/api/stoves/s1/programs/${id}`)).status).toBe(204);
+    expect((await call("GET", `/api/stoves/s1/programs/${id}`)).status).toBe(404);
+    expect((await call("GET", "/api/stoves/s1/programs")).json).toHaveLength(1);
   });
 
   it("rejects an invalid Program with its problems, on create and on edit", async () => {
     const { call } = await setup();
     const bad = { name: "P", dayGroups: [{ days: ["mon"], steps: [{ time: "07:00", on: true }, { time: "07:15", off: true }] }] };
-    const created = await call("POST", "/api/programs", bad);
+    const created = await call("POST", "/api/stoves/s1/programs", bad);
     expect(created.status).toBe(400);
     expect(created.json.problems).toEqual([
       { code: "too_close", first: { day: "mon", time: "07:00" }, second: { day: "mon", time: "07:15" }, minGap: 30 },
     ]);
-    const { json } = await call("POST", "/api/programs", WINTER);
-    expect((await call("PUT", `/api/programs/${json.id}`, bad)).status).toBe(400);
-    expect((await call("GET", `/api/programs/${json.id}`)).json.name).toBe("Inverno");
+    const { json } = await call("POST", "/api/stoves/s1/programs", WINTER);
+    expect((await call("PUT", `/api/stoves/s1/programs/${json.id}`, bad)).status).toBe(400);
+    expect((await call("GET", `/api/stoves/s1/programs/${json.id}`)).json.name).toBe("Inverno");
   });
 
   it("activates a Program for a Stove, pauses and resumes it", async () => {
     const { call } = await setup();
     expect((await call("GET", "/api/stoves/s1/active-program")).json).toEqual({ programId: null, paused: false });
 
-    const { json: program } = await call("POST", "/api/programs", WINTER);
+    const { json: program } = await call("POST", "/api/stoves/s1/programs", WINTER);
     expect((await call("PUT", "/api/stoves/s1/active-program", { programId: program.id })).json).toEqual({
       programId: program.id,
       paused: false,
@@ -92,16 +92,29 @@ describe("programs API", () => {
 
   it("clears the Active Program when its Program is deleted", async () => {
     const { call } = await setup();
-    const { json: program } = await call("POST", "/api/programs", WINTER);
+    const { json: program } = await call("POST", "/api/stoves/s1/programs", WINTER);
     await call("PUT", "/api/stoves/s1/active-program", { programId: program.id });
-    await call("DELETE", `/api/programs/${program.id}`);
+    await call("DELETE", `/api/stoves/s1/programs/${program.id}`);
     expect((await call("GET", "/api/stoves/s1/active-program")).json).toEqual({ programId: null, paused: false });
+  });
+
+  it("keeps each Stove's Programs apart", async () => {
+    const { call } = await setup();
+    const { json: program } = await call("POST", "/api/stoves/s1/programs", WINTER);
+    expect((await call("GET", "/api/stoves/s2/programs")).json).toEqual([]);
+    expect((await call("GET", `/api/stoves/s2/programs/${program.id}`)).status).toBe(404);
+    expect((await call("PUT", `/api/stoves/s2/programs/${program.id}`, WINTER)).status).toBe(404);
+    expect((await call("DELETE", `/api/stoves/s2/programs/${program.id}`)).status).toBe(404);
+    expect((await call("PUT", "/api/stoves/s2/active-program", { programId: program.id })).status).toBe(404);
+    expect((await call("GET", "/api/stoves/s1/programs")).json).toHaveLength(1);
   });
 
   it("refuses an unknown Stove or Program", async () => {
     const { call } = await setup();
     expect((await call("PUT", "/api/stoves/nope/active-program", { programId: null })).status).toBe(404);
+    expect((await call("GET", "/api/stoves/nope/programs")).status).toBe(404);
+    expect((await call("POST", "/api/stoves/nope/programs", WINTER)).status).toBe(404);
     expect((await call("PUT", "/api/stoves/s1/active-program", { programId: 999 })).status).toBe(404);
-    expect((await call("PUT", "/api/programs/999", WINTER)).status).toBe(404);
+    expect((await call("PUT", "/api/stoves/s1/programs/999", WINTER)).status).toBe(404);
   });
 });

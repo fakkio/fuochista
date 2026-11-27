@@ -23,9 +23,11 @@ const MIGRATIONS: string[] = [
    );`,
   `CREATE TABLE programs (
      id INTEGER PRIMARY KEY,
+     stove_id TEXT NOT NULL,
      name TEXT NOT NULL,
      day_groups TEXT NOT NULL
    );
+   CREATE INDEX programs_stove ON programs (stove_id);
    CREATE TABLE active_programs (
      stove_id TEXT PRIMARY KEY,
      program_id INTEGER NOT NULL REFERENCES programs(id) ON DELETE CASCADE,

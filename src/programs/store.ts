@@ -14,33 +14,37 @@ export interface ActiveProgram {
 type Row = { id: number; name: string; day_groups: string };
 const toProgram = (r: Row): Program => ({ id: r.id, name: r.name, dayGroups: JSON.parse(r.day_groups) as DayGroup[] });
 
-/** Saved Programs and each Stove's Active Program. Input must already be validated. */
+/** Each Stove's saved Programs and its Active Program. Input must already be validated. */
 export function createProgramStore(db: Database) {
   return {
-    list(): Program[] {
-      return (db.prepare("SELECT id, name, day_groups FROM programs ORDER BY id").all() as Row[]).map(toProgram);
+    list(stoveId: string): Program[] {
+      return (db.prepare("SELECT id, name, day_groups FROM programs WHERE stove_id = ? ORDER BY id").all(stoveId) as Row[]).map(toProgram);
     },
 
-    get(id: number): Program | null {
-      const row = db.prepare("SELECT id, name, day_groups FROM programs WHERE id = ?").get(id) as Row | undefined;
+    /** A Program of another Stove counts as missing. */
+    get(stoveId: string, id: number): Program | null {
+      const row = db.prepare("SELECT id, name, day_groups FROM programs WHERE stove_id = ? AND id = ?").get(stoveId, id) as Row | undefined;
       return row ? toProgram(row) : null;
     },
 
-    create(p: ProgramInput): Program {
+    create(stoveId: string, p: ProgramInput): Program {
       const { lastInsertRowid } = db
-        .prepare("INSERT INTO programs (name, day_groups) VALUES (?, ?)")
-        .run(p.name, JSON.stringify(p.dayGroups));
+        .prepare("INSERT INTO programs (stove_id, name, day_groups) VALUES (?, ?, ?)")
+        .run(stoveId, p.name, JSON.stringify(p.dayGroups));
       return { id: Number(lastInsertRowid), ...p };
     },
 
-    /** Returns false when the Program doesn't exist. */
-    update(id: number, p: ProgramInput): boolean {
-      return db.prepare("UPDATE programs SET name = ?, day_groups = ? WHERE id = ?").run(p.name, JSON.stringify(p.dayGroups), id).changes > 0;
+    /** Returns false when the Stove has no such Program. */
+    update(stoveId: string, id: number, p: ProgramInput): boolean {
+      return (
+        db.prepare("UPDATE programs SET name = ?, day_groups = ? WHERE stove_id = ? AND id = ?").run(p.name, JSON.stringify(p.dayGroups), stoveId, id)
+          .changes > 0
+      );
     },
 
     /** Deleting the Active Program leaves its Stove with none. */
-    delete(id: number): boolean {
-      return db.prepare("DELETE FROM programs WHERE id = ?").run(id).changes > 0;
+    delete(stoveId: string, id: number): boolean {
+      return db.prepare("DELETE FROM programs WHERE stove_id = ? AND id = ?").run(stoveId, id).changes > 0;
     },
 
     active(stoveId: string): ActiveProgram {

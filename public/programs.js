@@ -1,4 +1,4 @@
-// Programs: list, editor, and the Active Program of the first Stove.
+// Programs of the first Stove: list, editor, and its Active Program.
 const DAYS = [
   ["mon", "Lun"], ["tue", "Mar"], ["wed", "Mer"], ["thu", "Gio"], ["fri", "Ven"], ["sat", "Sab"], ["sun", "Dom"],
 ];
@@ -29,6 +29,8 @@ const el = (tag, props = {}, ...children) => {
   return node;
 };
 
+const stovePath = (path) => `/api/stoves/${encodeURIComponent(stoveId)}${path}`;
+
 async function api(method, path, body) {
   const res = await fetch(path, {
     method,
@@ -43,7 +45,7 @@ function renderList() {
     ...programs.map((p) => {
       const item = el("li", {}, el("span", { textContent: p.name }));
       if (p.id === active.programId) item.setAttribute("aria-current", "true");
-      else if (stoveId) item.append(el("button", { type: "button", textContent: "Attiva", onclick: () => setActive(p.id, false) }));
+      else item.append(el("button", { type: "button", textContent: "Attiva", onclick: () => setActive(p.id, false) }));
       item.append(
         el("button", { type: "button", className: "secondary", textContent: "Modifica", onclick: () => openEditor(p) }),
         el("button", { type: "button", className: "secondary", textContent: "Elimina", onclick: () => remove(p) }),
@@ -58,19 +60,19 @@ function renderList() {
 }
 
 async function load() {
-  programs = (await api("GET", "/api/programs")).json;
-  if (stoveId) active = (await api("GET", `/api/stoves/${encodeURIComponent(stoveId)}/active-program`)).json;
+  programs = (await api("GET", stovePath("/programs"))).json;
+  active = (await api("GET", stovePath("/active-program"))).json;
   renderList();
 }
 
 async function setActive(programId, paused) {
-  const res = await api("PUT", `/api/stoves/${encodeURIComponent(stoveId)}/active-program`, { programId, paused });
+  const res = await api("PUT", stovePath("/active-program"), { programId, paused });
   if (res.ok) active = res.json;
   renderList();
 }
 
 async function remove(program) {
-  await api("DELETE", `/api/programs/${program.id}`);
+  await api("DELETE", stovePath(`/programs/${program.id}`));
   await load();
 }
 
@@ -190,7 +192,7 @@ function describe(problem) {
 editor.addEventListener("submit", async (event) => {
   event.preventDefault();
   const body = readEditor();
-  const res = editingId === null ? await api("POST", "/api/programs", body) : await api("PUT", `/api/programs/${editingId}`, body);
+  const res = editingId === null ? await api("POST", stovePath("/programs"), body) : await api("PUT", stovePath(`/programs/${editingId}`), body);
   if (!res.ok) {
     errorBox.textContent = (res.json.problems ?? [{}]).map(describe).join(" ");
     errorBox.hidden = false;
@@ -206,4 +208,5 @@ document.getElementById("cancel-edit").addEventListener("click", () => (editor.h
 
 const stoves = await (await fetch("/api/stoves")).json();
 stoveId = stoves[0]?.id ?? null;
-await load();
+if (stoveId) await load();
+else section.hidden = true;
